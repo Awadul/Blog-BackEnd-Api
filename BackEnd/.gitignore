@@ -1,0 +1,3 @@
+// In .gitignore
+/node_modules
+.env
