@@ -10,12 +10,16 @@ import cookieParser from 'cookie-parser';
 const PORT = 3000;
 const app = express();      // initiate the server
 
-app.use(cors());    // to allow cross origin resource sharing
+app.use(cors({
+    origin: 'http://localhost:5173',    // only the current frontend domain is in allowed list  
+    credentials: true,                                      // to allow the cookies to be sent to the frontend
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));    // to allow cross origin resource sharing
 app.use(express.json())     // to parse the request body into json data
 app.use(express.urlencoded({ extended: true }))   // allows to parse the query parameter
 app.use(cookieParser())
 app.use("/user", userRouter);
-app.use("/post", postRouter);
+app.use("/api", postRouter);
 
 
 app.post("/test", (req, res) => {

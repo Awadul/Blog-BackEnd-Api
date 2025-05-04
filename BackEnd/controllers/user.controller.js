@@ -29,7 +29,9 @@ const userRegistrationHandler = async (req, res) => {
 
     } catch (error) {
         // res.status(500).json({ error: "There was error in registering the user" + error });
-        res.status(500).json({ error: error.errorResponse.code, duplicate: error.errorResponse.keyPattern });
+        console.log(error);
+        res.status(500).json({ error: "There was error in registering the user" })
+        // res.status(500).json({ error: (error.errorResponse.code || error), duplicate: error.errorResponse.keyPattern });
     }
 };
 

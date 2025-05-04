@@ -25,7 +25,7 @@ postRouter.get("/posts", feedHandler)
 postRouter.get("/posts/:postId", getPostHandler)
 
 
-/** To get the reiews of a specific post */
+/** To get the reviews of a specific post */
 postRouter.get("/posts/:postId/reviews", getPostReviewsHandler)
 
 

@@ -5,13 +5,15 @@ import cloudinary from '../config/cloudinaryConfig.js';
 /*************************************/
 const createPostHandler = async (req, res) => {
     try {
-        // console.log(req.file);
+        // console.log(req.userInfo)
+        // console.log(req.body)
+        // console.log(req.file || req.files);
         const base64 = Buffer.from(req.file.buffer).toString("base64");     // need to convert file format to string 
         const dataURI = "data:" + req.file.mimetype + ";base64," + base64;
 
         console.log("trying to put it in cloudinary");
         const cloudResponse = await cloudinary.uploader.upload(dataURI);    // upload file on the cloud
-        // console.log(cloudResponse);
+        console.log(cloudResponse);
 
         const { tagLine, content } = req.body;
 
@@ -53,7 +55,7 @@ const getPostHandler = async (req, res) => {
         return res.status(404).json({ error: "incorrect post id" });
 
     console.log("testing get post with specific id", getPost);
-
+    console.log(getPost)
     res.status(200).json(getPost);
 };
 /*************/

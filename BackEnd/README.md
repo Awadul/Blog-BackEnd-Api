@@ -1,220 +1,144 @@
-# Blog Backend API Documentation
+# My Blog - Backend
 
-## Overview
-This is the backend API for the Blog application, built with Express.js and MongoDB. The API provides endpoints for user management, post creation, and review functionality.
+This is the backend service for the My Blog application, providing APIs for user authentication, post management, reviews, and image uploads.
+
+## Features
+
+*   **User Authentication:** User registration and login using JWT (stored in HTTP-only cookies).
+*   **Post Management:** Create, read posts (feed and individual).
+*   **Review Management:** Add, read, update, and delete reviews on posts.
+*   **Image Uploads:** Handles cover image uploads for posts using Multer and Cloudinary.
+*   **Protected Routes:** Middleware verifies user authentication for protected actions.
 
 ## Tech Stack
-- Node.js
-- Express.js
-- MongoDB with Mongoose
-- JWT Authentication
-- Cloudinary for image storage
-- Multer for file uploads
+
+*   **Runtime:** Node.js
+*   **Framework:** Express.js
+*   **Database:** MongoDB with Mongoose ODM
+*   **Authentication:** JSON Web Tokens (JWT), bcrypt (for password hashing)
+*   **Image Storage:** Cloudinary
+*   **File Uploads:** Multer
+*   **Middleware:** CORS, cookie-parser
+*   **Development:** Nodemon
 
 ## Prerequisites
-- Node.js (v14 or higher)
-- MongoDB
-- Cloudinary account
 
-## Environment Variables
-Create a `.env` file in the root directory with the following variables:
-```env
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-```
+*   Node.js (v18 or later recommended)
+*   npm or yarn
+*   MongoDB instance (local or cloud-based like MongoDB Atlas)
+*   Cloudinary account (for API Key, Secret, and Cloud Name)
 
 ## Installation
-1. Clone the repository
-2. Navigate to the backend directory:
-   ```bash
-   cd BackEnd
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
 
-The server will start on port 3000 by default.
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd My-Blog/BackEnd
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+3.  **Set up Environment Variables:**
+    Create a `.env` file in the `BackEnd` directory and add the following variables:
+
+    ```dotenv
+    MONGO_URL=<your_mongodb_connection_string>
+    JWT_SECRET=<your_strong_jwt_secret>
+    CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
+    CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+    CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
+    # Optional: Specify a port if different from 3000
+    # PORT=3000
+    ```
+
+## Running the Application
+
+*   **Development Mode (with auto-reload):**
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
+    The server will typically start on `http://localhost:3000` (or the port specified in `.env`).
+
+*   **Production Mode (requires a build step if applicable, or just run directly):**
+    ```bash
+    node index.js
+    ```
 
 ## API Endpoints
 
+The base URL is typically `http://localhost:3000`.
+
 ### User Routes (`/user`)
 
-#### Register User
-- **POST** `/user/register`
-- **Description**: Register a new user
-- **Body**:
-  ```json
-  {
-    "username": "string",
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- **Response**: User object with JWT token
-
-#### Login User
-- **POST** `/user/login`
-- **Description**: Login existing user
-- **Body**:
-  ```json
-  {
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- **Response**: User object with JWT token
-
-#### Get User Profile
-- **GET** `/user/profile`
-- **Description**: Get current user's profile
-- **Headers**: `Authorization: Bearer <token>`
-- **Response**: User profile object
+*   **`POST /user/register`**: Register a new user.
+    *   Body: `{ "userName": "string", "email": "string", "password": "string" }`
+*   **`POST /user/login`**: Log in a user.
+    *   Body: `{ "email": "string", "password": "string" }`
+    *   Sets an HTTP-only cookie (`token`) upon success.
+*   **`GET /user/dashboard`**: Get dashboard info for the authenticated user.
+    *   Requires authentication (valid `token` cookie).
+*   **`POST /user/logout`** (Assumed - often implemented, check `user.controller.js`): Logs out the user.
+    *   Clears the `token` cookie.
 
 ### Post Routes (`/post`)
 
-#### Create Post
-- **POST** `/post`
-- **Description**: Create a new blog post
-- **Headers**: `Authorization: Bearer <token>`
-- **Body**:
-  ```json
-  {
-    "title": "string",
-    "content": "string",
-    "image": "file" // optional
-  }
-  ```
-- **Response**: Created post object
+*   **`POST /post/posts`**: Create a new post.
+    *   Requires authentication.
+    *   Expects `multipart/form-data`.
+    *   Fields: `title` (string), `tagLine` (string), `content` (string), `cover` (file).
+*   **`GET /post/posts`**: Get all posts (feed - excludes full content).
+*   **`GET /post/posts/:postId`**: Get details of a specific post.
+*   **`GET /post/posts/:postId/reviews`**: Get all reviews for a specific post.
+*   **`POST /post/posts/:postId/reviews`**: Add a review to a post.
+    *   Requires authentication.
+    *   Body: `{ "review": "string" }`
+*   **`PUT /post/posts/:postId/review/:reviewId`**: Update a specific review owned by the user.
+    *   Requires authentication.
+    *   Body: `{ "review": "string" }`
+*   **`DELETE /post/posts/:postId/reviews/:reviewId`**: Delete a specific review owned by the user.
+    *   Requires authentication.
 
-#### Get All Posts
-- **GET** `/post`
-- **Description**: Get all blog posts
-- **Query Parameters**:
-  - `page`: Page number (default: 1)
-  - `limit`: Posts per page (default: 10)
-- **Response**: Array of post objects
+## Project Structure
 
-#### Get Single Post
-- **GET** `/post/:id`
-- **Description**: Get a specific blog post
-- **Parameters**: Post ID
-- **Response**: Post object
-
-#### Update Post
-- **PUT** `/post/:id`
-- **Description**: Update an existing post
-- **Headers**: `Authorization: Bearer <token>`
-- **Parameters**: Post ID
-- **Body**:
-  ```json
-  {
-    "title": "string",
-    "content": "string",
-    "image": "file" // optional
-  }
-  ```
-- **Response**: Updated post object
-
-#### Delete Post
-- **DELETE** `/post/:id`
-- **Description**: Delete a post
-- **Headers**: `Authorization: Bearer <token>`
-- **Parameters**: Post ID
-- **Response**: Success message
-
-### Review Routes
-
-#### Add Review
-- **POST** `/post/:postId/review`
-- **Description**: Add a review to a post
-- **Headers**: `Authorization: Bearer <token>`
-- **Parameters**: Post ID
-- **Body**:
-  ```json
-  {
-    "rating": "number",
-    "comment": "string"
-  }
-  ```
-- **Response**: Created review object
-
-## Data Models
-
-### User Model
-```javascript
-{
-  username: String,
-  email: String,
-  password: String (hashed),
-  profilePicture: String (URL),
-  createdAt: Date,
-  updatedAt: Date
-}
+```
+BackEnd/
+├── config/                 # Configuration files (DB, Cloudinary, Multer, Auth)
+│   ├── ConnectDB.js
+│   ├── authJWT.js
+│   ├── cloudinaryConfig.js
+│   ├── multerFileUpload.js
+│   └── verifyAuth.js
+├── controllers/            # Request handlers (business logic)
+│   ├── post.controller.js
+│   ├── review.controller.js # (Assumed for review logic)
+│   └── user.controller.js
+├── models/                 # Mongoose data models (schema definitions)
+│   ├── post.model.js
+│   ├── review.model.js
+│   └── user.models.js
+├── node_modules/           # Project dependencies
+├── routes/                 # Express route definitions
+│   ├── postRouter.js
+│   └── userRouter.js
+├── .env                    # Environment variables (create this file)
+├── .gitignore              # Git ignore rules
+├── index.js                # Main application entry point
+├── package-lock.json       # Dependency lock file
+├── package.json            # Project metadata and dependencies
+└── README.md               # This file
 ```
 
-### Post Model
-```javascript
-{
-  title: String,
-  content: String,
-  image: String (URL),
-  author: ObjectId (ref: User),
-  reviews: [ObjectId (ref: Review)],
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+## Contributing
 
-### Review Model
-```javascript
-{
-  rating: Number,
-  comment: String,
-  user: ObjectId (ref: User),
-  post: ObjectId (ref: Post),
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+Contributions are welcome! Please feel free to submit a pull request or open an issue.
 
-## Error Handling
-The API uses standard HTTP status codes:
-- 200: Success
-- 201: Created
-- 400: Bad Request
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not Found
-- 500: Internal Server Error
+## License
 
-## Security
-- JWT-based authentication
-- Password hashing using bcrypt
-- CORS enabled
-- Cookie-based session management
-
-## File Upload
-- Supports image uploads for posts
-- Uses Cloudinary for image storage
-- Maximum file size: 5MB
-- Supported formats: JPG, PNG, GIF
-
-## Rate Limiting
-Currently, there is no rate limiting implemented. Consider implementing rate limiting for production use.
-
-## Future Improvements
-1. Add input validation
-2. Implement rate limiting
-3. Add API documentation with Swagger
-4. Add unit and integration tests
-5. Implement caching
-6. Add logging system
-7. Add health check endpoints 
+(Specify your license here, e.g., MIT License) 
