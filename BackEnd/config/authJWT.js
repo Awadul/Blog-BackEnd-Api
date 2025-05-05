@@ -1,7 +1,6 @@
 import User from "../models/user.models.js";
 import jwt from "jsonwebtoken";
 import { CastError, ValidationError } from "../utils/errorHandler.js";
-import { text } from "express";
 
 const auth = async (req, res, next) => {
 

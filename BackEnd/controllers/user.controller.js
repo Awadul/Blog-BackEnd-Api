@@ -3,10 +3,10 @@ import User from "../models/user.models.js";
 import { ValidationError, CastError } from "../utils/errorHandler.js";
 import { body, validationResult, matchedData } from "express-validator";
 
-const userDashBoardHandler = async (req, res) => {
-    // console.log("user is trying to get it's informatio");
+const userDashBoardHandler = async (req, res, next) => {
+    console.log("user is trying to get it's informatio");
     try {
-        const userInfo = await User.find({ _id: req.userInfo[0]._idw })
+        const userInfo = await User.find({ _id: req.userInfo[0]._id })
         if (!userInfo) {
             throw new CustomError(404, "could find user with these credentials")
         }

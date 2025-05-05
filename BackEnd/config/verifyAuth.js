@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.models.js';
 import { ValidationError } from '../utils/errorHandler.js';
-import { body, validationResult, matchedData } from "express-validator";
 
 
 const verifyAuth = async (req, res, next) => {
@@ -11,6 +10,10 @@ const verifyAuth = async (req, res, next) => {
 
         // console.log("testing cookies in verifyauth ", req.cookies);
 
+        if (!req.cookies.token) {
+            throw new ValidationError(401, "Authentication token is missing");
+        }
+        console.log("Verifying JWT ", req.cookies.token, process.env.JWT_SECRET_KEY)
         const userInfo = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
 
         // console.log(`verifying user info from cookies ${userInfo}`);

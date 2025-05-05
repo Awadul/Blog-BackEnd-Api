@@ -6,7 +6,9 @@ import userRouter from './routes/userRouter.js'
 import postRouter from './routes/postRouter.js';
 import cookieParser from 'cookie-parser';
 import errorHandler from './utils/errorHandler.js';
-
+import {
+    requestLogger
+} from './middleware/requestLogger.js';
 const PORT = 3000;
 const app = express();      // initiate the server
 
@@ -18,8 +20,12 @@ app.use(cors({
 app.use(express.json())     // to parse the request body into json data
 app.use(express.urlencoded({ extended: true }))   // allows to parse the query parameter
 app.use(cookieParser())
+
+app.use(requestLogger);     // request logger middleware
+
 app.use("/user", userRouter);
 app.use("/api", postRouter);
+
 app.use(errorHandler);
 
 app.post("/test", (req, res) => {
