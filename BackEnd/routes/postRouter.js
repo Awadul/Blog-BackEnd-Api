@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import userUpload from '../config/multerFileUpload.js';
 import verifyAuth from '../config/verifyAuth.js';
+import { body, validationResult, matchedData } from "express-validator";
 import {
     createPostHandler,
     feedHandler,
@@ -8,7 +9,8 @@ import {
     getPostReviewsHandler,
     addReviewToPostHandler,
     UpdatePostReviewHandler,
-    deletePostReviewHandler
+    deletePostReviewHandler,
+    searchPostsHandler
 } from '../controllers/post.controller.js';
 
 const postRouter = Router();
@@ -20,6 +22,8 @@ postRouter.post("/posts", verifyAuth, userUpload.single('cover'), createPostHand
 /** To get all the posts on the front page */
 postRouter.get("/posts", feedHandler)
 
+/** Search posts */
+postRouter.get("/posts/search", searchPostsHandler)
 
 /** To move to a new post page. dedicated with the content */
 postRouter.get("/posts/:postId", getPostHandler)

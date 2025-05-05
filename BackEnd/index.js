@@ -5,7 +5,7 @@ import { connectDB } from './config/ConnectDB.js'
 import userRouter from './routes/userRouter.js'
 import postRouter from './routes/postRouter.js';
 import cookieParser from 'cookie-parser';
-
+import errorHandler from './utils/errorHandler.js';
 
 const PORT = 3000;
 const app = express();      // initiate the server
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }))   // allows to parse the query p
 app.use(cookieParser())
 app.use("/user", userRouter);
 app.use("/api", postRouter);
-
+app.use(errorHandler);
 
 app.post("/test", (req, res) => {
     console.log(req.body);
@@ -29,11 +29,16 @@ app.post("/test", (req, res) => {
 
 
 const start = async () => {
-    await connectDB().then(() => {
-        app.listen(PORT, (error) => {
-            console.log("server is listening on PORT " + PORT);
+    await connectDB()
+        .then(() => {
+            app.listen(PORT, (error) => {
+                console.log("server is listening on PORT " + PORT);
+            })
         })
-    })
+        .catch((error) => {
+            console.log("error in connecting to the database");
+            process.exit(1);    // to exit the process if the database connection fails
+        })
 }
 
 start();

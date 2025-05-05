@@ -30,7 +30,7 @@ function PostCard({ post }) {
     
   const handleCardClick = () => {
     // Correct: Navigate to the FRONTEND route defined in App.jsx
-    navigate(`/api/posts/${_id}`);
+    navigate(`/post/posts/${_id}`);
   };
 
   const handleImageLoad = () => {
